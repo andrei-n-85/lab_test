@@ -1,0 +1,222 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>dab_save_transmission_frame</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-01-03"><meta name="DC.source" content="dab_save_transmission_frame.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Creating output values for GRC</a></li><li><a href="#4">Save resampled data to file</a></li><li><a href="#7">Creating output values for GRC</a></li><li><a href="#8">Save resampled data to file</a></li></ul></div><pre class="codeinput"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% /physical_layer/dab_save_transmission_frame.m                           %</span>
+<span class="comment">%                                                                         %</span>
+<span class="comment">% Requires: - TF (matrix)                                                 %</span>
+<span class="comment">%           - fid (file ID)                                               %</span>
+<span class="comment">%                                                                         %</span>
+<span class="comment">% Returns:                                                                %</span>
+<span class="comment">%-------------------------------------------------------------------------%</span>
+<span class="comment">% This function is used to store the created data in an binary file.      %</span>
+<span class="comment">% First the result has to be resampled, as the USRP1 works with a         %</span>
+<span class="comment">% frequency of 2000 kHz but values were created for a DAB system with     %</span>
+<span class="comment">% 2048 kHz.                                                               %</span>
+<span class="comment">% To create the output for GRC, the values are scaled by the value 30000  %</span>
+<span class="comment">% in order to create values between -32,768 (-2^15) and 32,768 (+2^15) as %</span>
+<span class="comment">% a short values comprises 16 bits (65,536). Thus the value may not be    %</span>
+<span class="comment">% above these numbers. Furthermore, the output is stored as IQ-pair       %</span>
+<span class="comment">% (Inphase - Quadrature) which is required as input for the USRP1 with    %</span>
+<span class="comment">% short values. The result is then stored in the file given by the        %</span>
+<span class="comment">% variable fid.                                                           %</span>
+<span class="comment">%-------------------------------------------------------------------------%</span>
+<span class="comment">% MASTER THESIS: CHRISTOPHER TSCHISCHKA                                   %</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+
+<span class="keyword">function</span> dab_save_transmission_frame(TF, fid)
+
+    <span class="keyword">if</span> (0)
+</pre><pre class="codeinput">    <span class="comment">% Resampling</span>
+    <span class="comment">%resampled = resample(TF,4000,2048,1);</span>
+    resampled = resample(TF,2000,2048,1);
+</pre><h2>Creating output values for GRC<a name="3"></a></h2><p>Scaling</p><pre class="codeinput">    max_re = max(max(abs(real(resampled(1:100:end,1:10:end)))));
+    max_im = max(max(abs(imag(resampled(1:100:end,1:10:end)))));
+    scale =  25000 / max(max_re,max_im);
+    resampled = resampled * scale;
+
+    <span class="comment">% Reshape vector to I Q I Q I... format</span>
+    resampled_re = real(resampled);
+    resampled_im = imag(resampled);
+    trans_out = [(resampled_re(:))'; (resampled_im(:))'];
+    trans_out =  trans_out(:).';
+</pre><h2>Save resampled data to file<a name="4"></a></h2><pre class="codeinput">    <span class="comment">%fwrite(fid,trans_out,'short');</span>
+    fwrite(fid,trans_out,<span class="string">'single'</span>);
+</pre><pre class="codeinput">    <span class="keyword">else</span>
+</pre><pre class="codeinput">    <span class="comment">% Resampling</span>
+    <span class="comment">%resampled = resample(TF,4000,2048,1);</span>
+    resampled = resample(TF(:),2000,2048);
+
+    tau = 250;
+    resampled = resampled + [zeros(tau,1); 0*resampled(1:end-tau)];
+</pre><pre class="codeoutput">Error using dab_save_transmission_frame (line 54)
+Not enough input arguments.
+</pre><h2>Creating output values for GRC<a name="7"></a></h2><p>Scaling</p><pre class="codeinput">    max_re = max(max(abs(real(resampled(1:100:end,1:10:end)))));
+    max_im = max(max(abs(imag(resampled(1:100:end,1:10:end)))));
+    scale =  25000 / max(max_re,max_im);
+    resampled = int16(resampled * scale);
+
+    <span class="comment">% Reshape vector to I Q I Q I... format</span>
+    resampled_re = real(resampled);
+    resampled_im = imag(resampled);
+    trans_out = [(resampled_re(:))'; (resampled_im(:))'];
+    trans_out =  trans_out(:).';
+</pre><h2>Save resampled data to file<a name="8"></a></h2><pre class="codeinput">    <span class="comment">%fwrite(fid,trans_out,'short');</span>
+    fwrite(fid,trans_out,<span class="string">'single'</span>);
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+
+
+
+<span class="comment">% % For interpolation with factor 2:</span>
+<span class="comment">% resampled = (resample(TF,2*192000,196608));</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /physical_layer/dab_save_transmission_frame.m                           %
+%                                                                         %
+% Requires: - TF (matrix)                                                 %
+%           - fid (file ID)                                               %
+%                                                                         %
+% Returns:                                                                %
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-%
+% This function is used to store the created data in an binary file.      %
+% First the result has to be resampled, as the USRP1 works with a         %
+% frequency of 2000 kHz but values were created for a DAB system with     %
+% 2048 kHz.                                                               %
+% To create the output for GRC, the values are scaled by the value 30000  %
+% in order to create values between -32,768 (-2^15) and 32,768 (+2^15) as %
+% a short values comprises 16 bits (65,536). Thus the value may not be    %
+% above these numbers. Furthermore, the output is stored as IQ-pair       %
+% (Inphase - Quadrature) which is required as input for the USRP1 with    %
+% short values. The result is then stored in the file given by the        %
+% variable fid.                                                           %
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-%
+% MASTER THESIS: CHRISTOPHER TSCHISCHKA                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+function dab_save_transmission_frame(TF, fid)
+
+    if (0)
+    % Resampling
+    %resampled = resample(TF,4000,2048,1);
+    resampled = resample(TF,2000,2048,1);
+    
+    
+    %% Creating output values for GRC
+    % Scaling
+    max_re = max(max(abs(real(resampled(1:100:end,1:10:end)))));
+    max_im = max(max(abs(imag(resampled(1:100:end,1:10:end)))));
+    scale =  25000 / max(max_re,max_im);
+    resampled = resampled * scale;
+    
+    % Reshape vector to I Q I Q I... format
+    resampled_re = real(resampled);
+    resampled_im = imag(resampled);
+    trans_out = [(resampled_re(:))'; (resampled_im(:))'];
+    trans_out =  trans_out(:).';
+   
+
+    %% Save resampled data to file
+    %fwrite(fid,trans_out,'short');
+    fwrite(fid,trans_out,'single');
+    
+    else
+    % Resampling
+    %resampled = resample(TF,4000,2048,1);
+    resampled = resample(TF(:),2000,2048);
+
+    tau = 250;
+    resampled = resampled + [zeros(tau,1); 0*resampled(1:end-tau)];
+    
+    %% Creating output values for GRC
+    % Scaling
+    max_re = max(max(abs(real(resampled(1:100:end,1:10:end)))));
+    max_im = max(max(abs(imag(resampled(1:100:end,1:10:end)))));
+    scale =  25000 / max(max_re,max_im);
+    resampled = int16(resampled * scale);
+
+    % Reshape vector to I Q I Q I... format
+    resampled_re = real(resampled);
+    resampled_im = imag(resampled);
+    trans_out = [(resampled_re(:))'; (resampled_im(:))'];
+    trans_out =  trans_out(:).';
+   
+
+    %% Save resampled data to file
+    %fwrite(fid,trans_out,'short');
+    fwrite(fid,trans_out,'single');
+    end        
+        
+   
+    
+% % For interpolation with factor 2:
+% resampled = (resample(TF,2*192000,196608));
+
+##### SOURCE END #####
+--></body></html>
